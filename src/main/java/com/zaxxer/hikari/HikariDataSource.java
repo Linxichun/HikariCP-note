@@ -43,6 +43,9 @@ public class HikariDataSource extends HikariConfig implements DataSource, Closea
    private final AtomicBoolean isShutdown = new AtomicBoolean();
 
    private final HikariPool fastPathPool;
+   /**
+    * 每个datasource对象里都会持有一个HikariPool对象，记为pool，初始化后的datasource对象pool是空的，所以第一次getConnection的时候会进行实例化pool属性
+    * */
    private volatile HikariPool pool;
 
    /**
@@ -86,17 +89,21 @@ public class HikariDataSource extends HikariConfig implements DataSource, Closea
 
       // See http://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
       HikariPool result = pool;
+      // 池对象若为空，则创建
       if (result == null) {
+         // 同步锁，双重检查
          synchronized (this) {
             result = pool;
             if (result == null) {
+               // 校验一些配置属性是否合法
                validate();
                LOGGER.info("{} - Started.", getPoolName());
+               // 初始化pool，且将当前数据源config信息传过去，用于初始化一些属性
                pool = result = new HikariPool(this);
             }
          }
       }
-
+      // 通过池对象获取连接对象
       return result.getConnection();
    }
 

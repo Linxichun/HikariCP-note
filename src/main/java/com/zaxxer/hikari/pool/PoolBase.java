@@ -69,6 +69,7 @@ abstract class PoolBase
 
    PoolBase(final HikariConfig config)
    {
+      // 基本配置属性初始化
       this.config = config;
 
       this.networkTimeout = UNINITIALIZED;
@@ -86,7 +87,8 @@ abstract class PoolBase
       this.connectionTimeout = config.getConnectionTimeout();
       this.validationTimeout = config.getValidationTimeout();
       this.lastConnectionFailure = new AtomicReference<>();
-
+      /* 非常重要的一步，这里会利用jdbcUrl，userName等初始化一个连接源DriverDataSource类型，是HikariCP简单封装的一个数据源，
+      不同于HikariDataSource，这个数据源不会触发连接池操作，仅用来生产实际的物理连接 */
       initializeDataSource();
    }
 
