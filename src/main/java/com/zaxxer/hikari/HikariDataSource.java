@@ -75,6 +75,7 @@ public class HikariDataSource extends HikariConfig implements DataSource, Closea
    @Override
    public Connection getConnection() throws SQLException
    {
+      // 判断当前数据源是否被关闭
       if (isClosed()) {
          throw new SQLException("HikariDataSource " + this + " has been closed.");
       }
